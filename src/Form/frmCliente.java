@@ -293,11 +293,23 @@ public class frmCliente extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
+        try {
+            int fila = jTable1.getSelectedRow();
+            String sql = "delete from contactos where idCliente="+jTable1.getValueAt(fila, 0);
+            sent=conn.createStatement();
+            int n = sent.executeUpdate(sql);
+            if(n>0){
+                Llenar();
+                JOptionPane.showMessageDialog(null, "Datos Eliminados");
+                Limpiar();
+            } 
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null,"Error"+ e.getMessage());
+        }
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // TODO add your handling code here:
+        System.exit(0);
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
