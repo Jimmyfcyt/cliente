@@ -124,6 +124,11 @@ public class frmCliente extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
         jButton1.setText("Nuevo");
@@ -264,7 +269,27 @@ public class frmCliente extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
+        try {
+            String sql = "update contactos set nombre=?, direccion=?, telefono=?, correo=?"
+                    + "where idCliente=?";
+            int fila = jTable1.getSelectedRow();
+            String dao = (String)jTable1.getValueAt(fila, 0);
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, jTextField1.getText());
+            ps.setString(2, jTextField2.getText());
+            ps.setString(3, jTextField3.getText());
+            ps.setString(4, jTextField4.getText());
+            ps.setString(5, dao);
+            int n = ps.executeUpdate();
+            if(n>0){
+                Limpiar();
+                Llenar();
+                JOptionPane.showMessageDialog(null,"Datos modificados");
+            }
+        } catch (Exception e) {
+                JOptionPane.showMessageDialog(null,"Error"+ e.getMessage());
+
+        }
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -279,6 +304,26 @@ public class frmCliente extends javax.swing.JFrame {
          Limpiar();
         Habilitar();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        if (evt.getButton()==1){
+            int fila = jTable1.getSelectedRow();
+            try {
+                Habilitar();
+                String sql = "select * from contactos where idCliente="+jTable1.getValueAt(fila,0);
+                sent = conn.createStatement();
+                ResultSet rs = sent.executeQuery(sql);
+                rs.next();
+                jTextField1.setText(rs.getString("nombre"));
+                jTextField2.setText(rs.getString("direccion"));
+                jTextField3.setText(rs.getString("telefono"));
+                jTextField4.setText(rs.getString("correo"));
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_jTable1MouseClicked
 
     /**
      * @param args the command line arguments
