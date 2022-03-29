@@ -3,18 +3,76 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package Form;
+import javax.swing.table.DefaultTableModel;
+import dba.Mysql;
+import java.sql.Array.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Jimmy
  */
 public class frmCliente extends javax.swing.JFrame {
-
+    DefaultTableModel model;
+    Connection conn;
+    Statement sent;
     /**
      * Creates new form frmCliente
      */
     public frmCliente() {
         initComponents();
+        conn=Mysql.getConnection();
+        Deshabilitar();
+        Llenar();
+    }
+    
+    void Deshabilitar(){
+       jTextField1.setEditable(false);
+       jTextField2.setEditable(false);
+       jTextField3.setEditable(false);
+       jTextField4.setEditable(false);
+    }
+    
+    void Limpiar(){
+        jTextField1.setText("");
+        jTextField2.setText("");
+        jTextField3.setText("");
+        jTextField4.setText("");
+    }
+    void Habilitar(){
+       jTextField1.setEditable(true);
+       jTextField2.setEditable(true);
+       jTextField3.setEditable(true);
+       jTextField4.setEditable(true);
+       jTextField1.requestFocus();
+    }
+    void Llenar(){
+        try {
+            conn = Mysql.getConnection();
+            String[]titulos = {"id", "Nombre", "Dirección", "Teléfono", "Correo"}; 
+            String sql = "select * from contactos";
+            model = new DefaultTableModel(null, titulos);
+            sent= conn.createStatement();
+            ResultSet rs=sent.executeQuery(sql);
+            
+            String[]fila = new String[5];
+            while(rs.next()){
+                fila[0]=rs.getString("idCliente");
+                fila[1]=rs.getString("nombre");
+                fila[2]=rs.getString("direccion");
+                fila[3]=rs.getString("telefono");
+                fila[4]=rs.getString("correo");
+                model.addRow(fila);
+            }
+            jTable1.setModel(model);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -69,6 +127,11 @@ public class frmCliente extends javax.swing.JFrame {
         jScrollPane1.setViewportView(jTable1);
 
         jButton1.setText("Nuevo");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("Guardar");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -179,7 +242,25 @@ public class frmCliente extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+        try {
+            String sql = "insert into contactos (nombre, direccion, telefono, correo)"+
+                    "values(?,?,?,?)";
+            PreparedStatement ps = conn.prepareCall(sql);
+            ps.setString(1, jTextField1.getText());
+            ps.setString(2, jTextField2.getText());
+            ps.setString(3, jTextField3.getText());
+            ps.setString(4, jTextField4.getText());
+            
+            int n = ps.executeUpdate();
+            if(n>0){
+                JOptionPane.showMessageDialog(null, "Datos guardados correctamente");
+            }
+
+        } catch (Exception e) {
+                JOptionPane.showMessageDialog(null,"Error"+ e.getMessage());
+        }
+        Llenar();
+        Limpiar();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -193,6 +274,11 @@ public class frmCliente extends javax.swing.JFrame {
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+         Limpiar();
+        Habilitar();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
